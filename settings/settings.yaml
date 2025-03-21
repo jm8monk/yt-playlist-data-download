@@ -1,0 +1,36 @@
+# Global settings
+output_directory: "data_output"
+date_range:
+  start_date: "2025-02-01"  # YYYY-MM-DD format
+  end_date: "2025-02-28"    # YYYY-MM-DD format
+
+# Channel configurations
+channels:
+  Cadillac:
+    channel_id: "UCMMTsbfETvrSwwcvB7VE-iw"
+    playlists:
+      Explains:
+        - "PLONsyQ0cLqNEzrQfH0KOnokuOUEeHfwvo"
+      How To:
+        - "PLONsyQ0cLqNH7QmcNn2Mvb0Y1Qant0u-h"
+  
+  Buick:
+    channel_id: "UCZmCWjcFeojrg_s3bN2Ek4w"
+    playlists:
+      Envision How To:
+        - "PL_J7aTORMKewtDYUJVaKxNGOAygmU9ZRv"
+        - "PL_J7aTORMKez7iiAaqTcG6pwuLtDHokX7"
+        - "PL_J7aTORMKezaSP9fUXHNYCzxbmxCAROE"
+      EncoreGX How To:
+        - "PL_J7aTORMKez7qlEjK7M6UHApiqHpYhsc"
+        - "PL_J7aTORMKey6V80lBQhn03B_1exRzgzw"
+        - "PL_J7aTORMKeyoscUMHTuRoAYb8QYJfUO5"
+
+  GMC:
+    channel_id: "UCVcZB2_5HBDVtw8B9c4tIHw"
+    playlists:
+      GMC Owners:
+        - "PLCK989HFlackhybEQCzLwWbHOfznUj-SZ"
+      GMC Hummer EV declassified:
+        - "PLCK989HFlackEmpZ3UWrYOGqXBzcPUgUh"
+        

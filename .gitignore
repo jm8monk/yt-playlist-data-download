@@ -1,0 +1,13 @@
+# Data and credentials
+data/
+tokens/
+settings/client_secret.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+.env
