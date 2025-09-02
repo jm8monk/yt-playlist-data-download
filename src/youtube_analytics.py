@@ -15,13 +15,14 @@ class YouTubeAnalytics:
         all_data = {}
         for group_name, playlist_ids in playlist_groups.items():
             print(f"Processing playlist group: {group_name}")
-            group_data = []
+            group_data = pd.DataFrame()
             for playlist_id in playlist_ids:
                 video_info = self._get_video_info(playlist_id)
                 daily_stats = self._get_daily_stats(video_info, start_date, end_date)
-                group_data.extend(daily_stats)
-            if group_data:
-                all_data[group_name] = pd.DataFrame(group_data)
+                df_data_by_month = self._aggregate_by_month(daily_stats)
+                group_data = pd.concat([group_data, df_data_by_month], ignore_index=True)
+            if not group_data.empty:
+                all_data[group_name] = group_data
         return all_data
 
     def _get_video_info(self, playlist_id):
@@ -46,31 +47,36 @@ class YouTubeAnalytics:
     def _get_daily_stats(self, video_info, start_date, end_date):
         daily_stats = []
         for video in video_info:
-            try:
-                request = self.youtube_analytics.reports().query(
-                    ids=f'channel=={self.channel_id}',
-                    startDate=start_date,
-                    endDate=end_date,
-                    metrics='views,likes,dislikes,shares,comments',
-                    dimensions='day',
-                    filters=f'video=={video["video_id"]}'
-                )
-                response = request.execute()
+            request = self.youtube_analytics.reports().query(
+                ids=f'channel=={self.channel_id}',
+                startDate=start_date,
+                endDate=end_date,
+                metrics='views,likes,dislikes,shares,comments',
+                dimensions='day',
+                filters=f'video=={video["video_id"]}'
+            )
+            response = request.execute()
 
-                for row in response.get('rows', []):
-                    # row = [date, views, likes, shares, comments]
-                    daily_stats.append({
-                        'video_id': video['video_id'],
-                        'title': video['title'],
-                        'published_at': pd.to_datetime(video['published_at']),
-                        'date': row[0],
-                        'views': row[1],
-                        'likes': row[2],
-                        'dislikes': row[3],
-                        'shares': row[4],
-                        'comments': row[5]
-                    })
-            except Exception as e:
-                print(f"Error getting analytics for video {video['title']}: {str(e)}")
+            for row in response.get('rows', []):
+                daily_stats.append({
+                    'video_id': video['video_id'],
+                    'title': video['title'],
+                    'published_at': video['published_at'],
+                    'date': pd.to_datetime(row[0]),
+                    'views': row[1],
+                    'likes': row[2],
+                    'dislikes': row[3],
+                    'shares': row[4],
+                    'comments': row[5]
+                })
 
         return daily_stats
+    
+    def _aggregate_by_month(self, daily_stats):
+        df = pd.DataFrame(daily_stats)
+        df = df.groupby([df["date"].dt.to_period("M"), "video_id", "title", "published_at"])[["views", 
+                                                                                              "likes",
+                                                                                              "dislikes",
+                                                                                              "comments",
+                                                                                              "shares"]].sum()
+        return df.reset_index()
